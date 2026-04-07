@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Comando Estelar: Sistema Solar 3D</title>
+    <title>Comando Estelar: Sistema Solar 3D - Edição Gigante</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -76,7 +76,7 @@
                 <div onclick="startExplorer()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
                     <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1446941611757-91d2c3bd3d45?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-blue-500/20"></div>
                     <h3 class="text-2xl font-bold mb-2 text-blue-400">01. Explorador</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Viagem guiada com dados técnicos e imagens reais de cada astro.</p>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Viagem guiada com astros gigantes e imagens reais de alta definição.</p>
                     <span class="text-blue-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Aceder Sistema →</span>
                 </div>
 
@@ -84,7 +84,7 @@
                 <div onclick="startSandbox()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
                     <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-purple-500/20"></div>
                     <h3 class="text-2xl font-bold mb-2 text-purple-400">02. Sandbox</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Simulador de gravidade. Reposicione os planetas no laboratório.</p>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Simulador de gravidade. Reposicione os astros massivos no laboratório.</p>
                     <span class="text-purple-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Iniciar Lab →</span>
                 </div>
 
@@ -92,7 +92,7 @@
                 <div onclick="openGallery()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
                     <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-yellow-500/20"></div>
                     <h3 class="text-2xl font-bold mb-2 text-yellow-500">03. Galeria NASA</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Fotografias reais das missões Voyager, Hubble e James Webb.</p>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Arquivos visuais das missões espaciais mais famosas da história.</p>
                     <span class="text-yellow-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Ver Arquivos →</span>
                 </div>
 
@@ -100,7 +100,7 @@
                 <div onclick="openQuiz()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
                     <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1606326666390-4e48dbe1fd5f?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-emerald-500/20"></div>
                     <h3 class="text-2xl font-bold mb-2 text-emerald-400">04. Desafio</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Teste os seus conhecimentos com um quiz temático do espaço.</p>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Teste os seus conhecimentos e conquiste a sua patente espacial.</p>
                     <span class="text-emerald-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Começar Teste →</span>
                 </div>
             </div>
@@ -167,7 +167,7 @@
         <!-- EXPLORADOR: DETALHES -->
         <div id="planet-details" class="absolute right-0 top-0 h-full w-full md:w-[600px] glass p-6 md:p-12 transform translate-x-full transition-transform duration-700 overflow-y-auto scrollbar-hide border-l border-white/10 z-50">
             <button onclick="closeDetails()" class="mb-6 md:mb-10 text-gray-400 hover:text-white flex items-center gap-4 font-black text-lg">✕ Fechar</button>
-            <h2 id="detail-name" class="text-5xl md:text-7xl font-black mb-2 text-white tracking-tighter uppercase"></h2>
+            <h2 id="detail-name" class="text-5xl md:text-7xl font-black mb-2 text-white tracking-tighter uppercase text-balance"></h2>
             <p id="detail-type" class="text-blue-400 font-black mb-6 md:mb-10 italic uppercase text-xs tracking-widest"></p>
             <div class="relative w-full aspect-square bg-black/80 rounded-[2.5rem] md:rounded-[3rem] mb-8 md:mb-10 overflow-hidden flex items-center justify-center border-4 border-white/5">
                 <img id="detail-img" src="" class="planet-image opacity-0 transition-opacity duration-1000">
@@ -178,11 +178,11 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3 md:gap-4">
                     <div class="p-4 md:p-6 bg-white/10 rounded-[1.2rem] md:rounded-[1.5rem]">
-                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2">Dist. Terra</h4>
+                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2 text-balance">Dist. Terra</h4>
                         <p id="dist-earth" class="text-lg md:text-2xl font-black text-white"></p>
                     </div>
                     <div class="p-4 md:p-6 bg-white/10 rounded-[1.2rem] md:rounded-[1.5rem]">
-                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2">Dist. Sol</h4>
+                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2 text-balance">Dist. Sol</h4>
                         <p id="dist-sun" class="text-lg md:text-2xl font-black text-white"></p>
                     </div>
                 </div>
@@ -198,25 +198,91 @@
     <div id="canvas-container"></div>
 
     <script>
+        /**
+         * Dados do Sistema Solar - Escalas ULTRA GIGANTES para Mobile/TV
+         * Aqui os tamanhos foram aumentados drasticamente para garantir visibilidade
+         * As distâncias foram proporcionalmente aumentadas para evitar que se toquem.
+         */
         const planetsData = {
-            "Sol": { color: 0xffcc00, size: 90, dist: 0, speed: 0, desc: "A nossa estrela central. O Sol contém 99,8% de toda a massa do sistema solar e fornece a energia necessária para a vida.", curiosidade: "No centro do Sol, a temperatura atinge os 15 milhões de graus Celsius.", distSun: "0 km", distEarth: "149.6M km", img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg", isStar: true },
-            "Mercúrio": { color: 0xaaaaaa, size: 28, dist: 240, speed: 0.03, desc: "O planeta mais próximo do Sol e o menor do sistema solar. Não possui atmosfera significativa.", curiosidade: "Apesar de estar perto do Sol, Mercúrio tem gelo em crateras polares profundas.", distSun: "57.9M km", distEarth: "91.7M km", img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg" },
-            "Vénus": { color: 0xe3bb76, size: 38, dist: 380, speed: 0.012, desc: "O planeta mais quente devido ao efeito estufa extremo da sua atmosfera densa de CO2.", curiosidade: "Um dia em Vénus é mais longo do que um ano terrestre.", distSun: "108.2M km", distEarth: "41.4M km", img: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg" },
-            "Terra": { color: 0x2266ff, size: 42, dist: 530, speed: 0.008, desc: "O nosso lar. O único planeta conhecido com água líquida em abundância e vida complexa.", curiosidade: "A Terra é o único planeta do sistema que não tem o nome de uma divindade romana.", distSun: "149.6M km", distEarth: "0 km", img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" },
-            "Lua": { color: 0xcccccc, size: 12, dist: 80, speed: 0.04, parent: "Terra", desc: "Satélite natural da Terra. Responsável pelas marés e pela estabilidade do eixo terrestre.", curiosidade: "A Lua tem terremotos (moonquakes) causados pela gravidade da Terra.", distSun: "149.6M km", distEarth: "384 mil km", img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" },
-            "Marte": { color: 0xff4422, size: 32, dist: 750, speed: 0.006, desc: "O planeta vermelho. Possui calotas polares de gelo e o maior vulcão do sistema solar.", curiosidade: "Em Marte, podes saltar três vezes mais alto do que na Terra devido à baixa gravidade.", distSun: "227.9M km", distEarth: "78.3M km", img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg" },
-            "Júpiter": { color: 0xd39c7e, size: 85, dist: 1050, speed: 0.003, desc: "O maior planeta do sistema. Um gigante gasoso composto principalmente por hidrogénio e hélio.", curiosidade: "Júpiter tem 95 luas conhecidas orbitando ao seu redor.", distSun: "778.5M km", distEarth: "628.7M km", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg" },
-            "Saturno": { color: 0xc5ab6e, size: 75, dist: 1400, speed: 0.0015, desc: "Famoso pelos seus magníficos anéis feitos de gelo, poeira e rochas.", curiosidade: "Os anéis de Saturno têm apenas cerca de 10 metros de espessura em média.", distSun: "1.4B km", distEarth: "1.2B km", img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg" },
-            "Urano": { color: 0xb5e1e1, size: 55, dist: 1750, speed: 0.0008, desc: "Um gigante de gelo que orbita o Sol 'de lado', com o seu eixo quase paralelo ao plano orbital.", curiosidade: "Urano é o planeta mais frio do sistema solar, com temperaturas de -224°C.", distSun: "2.8B km", distEarth: "2.6B km", img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg" },
-            "Neptuno": { color: 0x4b70dd, size: 55, dist: 2050, speed: 0.0005, desc: "O planeta mais distante do Sol. Conhecido pelos seus ventos supersónicos extremamente fortes.", curiosidade: "Neptuno foi o primeiro planeta descoberto através de cálculos matemáticos antes de ser visto.", distSun: "4.5B km", distEarth: "4.3B km", img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg" }
+            "Sol": { 
+                color: 0xffcc00, size: 250, dist: 0, speed: 0, 
+                desc: "O Sol é uma estrela anã amarela que contém 99,8% de toda a massa do sistema solar. É o motor de luz e calor para todos os planetas.", 
+                curiosidade: "A luz solar demora cerca de 8 minutos e 20 segundos para chegar à Terra.", 
+                distSun: "0 km", distEarth: "149.6M km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg", 
+                isStar: true 
+            },
+            "Mercúrio": { 
+                color: 0xaaaaaa, size: 100, dist: 650, speed: 0.02, 
+                desc: "O planeta mais próximo do Sol. Apesar de pequeno, é extremamente denso e veloz na sua órbita.", 
+                curiosidade: "Um ano em Mercúrio dura apenas 88 dias terrestres.", 
+                distSun: "57.9M km", distEarth: "91.7M km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg" 
+            },
+            "Vénus": { 
+                color: 0xe3bb76, size: 110, dist: 1000, speed: 0.01, 
+                desc: "O planeta mais quente. A sua atmosfera de CO2 cria um efeito estufa imparável que derrete metal na superfície.", 
+                curiosidade: "Vénus gira na direção oposta à maioria dos planetas.", 
+                distSun: "108.2M km", distEarth: "41.4M km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg" 
+            },
+            "Terra": { 
+                color: 0x2266ff, size: 120, dist: 1400, speed: 0.007, 
+                desc: "A nossa casa. Único local conhecido com água líquida em abundância e vida complexa.", 
+                curiosidade: "A Terra é o único planeta que não tem o nome de um deus grego ou romano.", 
+                distSun: "149.6M km", distEarth: "0 km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" 
+            },
+            "Lua": { 
+                color: 0xcccccc, size: 40, dist: 180, speed: 0.04, parent: "Terra", 
+                desc: "O satélite natural da Terra. Responsável pelas marés e por estabilizar o eixo do nosso planeta.", 
+                curiosidade: "A Lua afasta-se da Terra cerca de 3,8 cm todos os anos.", 
+                distSun: "149.6M km", distEarth: "384 mil km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" 
+            },
+            "Marte": { 
+                color: 0xff4422, size: 110, dist: 1900, speed: 0.005, 
+                desc: "O planeta vermelho. Casa do Monte Olimpo, o vulcão mais alto de todo o sistema solar.", 
+                curiosidade: "Em Marte, o pôr do sol tem uma tonalidade azul.", 
+                distSun: "227.9M km", distEarth: "78.3M km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg" 
+            },
+            "Júpiter": { 
+                color: 0xd39c7e, size: 180, dist: 2600, speed: 0.003, 
+                desc: "O gigante gasoso. Tão massivo que poderia conter todos os outros planetas no seu interior duas vezes.", 
+                curiosidade: "Júpiter tem uma tempestade maior que a Terra ativa há centenas de anos.", 
+                distSun: "778.5M km", distEarth: "628.7M km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg" 
+            },
+            "Saturno": { 
+                color: 0xc5ab6e, size: 160, dist: 3400, speed: 0.0015, 
+                desc: "A joia do sistema solar. Famoso pelos seus anéis majestosos feitos de gelo e poeira espacial.", 
+                curiosidade: "Saturno é tão pouco denso que flutuaria se houvesse um oceano gigante.", 
+                distSun: "1.4B km", distEarth: "1.2B km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg" 
+            },
+            "Urano": { 
+                color: 0xb5e1e1, size: 140, dist: 4200, speed: 0.0008, 
+                desc: "O gigante gelado que orbita de lado. A sua cor ciano vem do metano na sua atmosfera gélida.", 
+                curiosidade: "Em Urano, chovem diamantes nas profundezas da sua atmosfera.", 
+                distSun: "2.8B km", distEarth: "2.6B km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg" 
+            },
+            "Neptuno": { 
+                color: 0x4b70dd, size: 140, dist: 5000, speed: 0.0005, 
+                desc: "O mundo dos ventos supersónicos. É o planeta mais distante e um dos mais frios que conhecemos.", 
+                curiosidade: "Neptuno foi descoberto primeiro através de cálculos matemáticos.", 
+                distSun: "4.5B km", distEarth: "4.3B km", 
+                img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg" 
+            }
         };
 
         const galleryData = [
-            { t: "Pilares da Criação", u: "https://images-assets.nasa.gov/image/PIA23645/PIA23645~orig.jpg", d: "Telescópio Hubble" },
-            { t: "Anéis de Saturno", u: "https://images-assets.nasa.gov/image/PIA06240/PIA06240~orig.jpg", d: "Sonda Cassini" },
-            { t: "Nascer da Terra", u: "https://images-assets.nasa.gov/image/as08-14-2383/as08-14-2383~orig.jpg", d: "Missão Apollo 8" },
-            { t: "Turbilhões em Júpiter", u: "https://images-assets.nasa.gov/image/PIA21971/PIA21971~orig.jpg", d: "Sonda Juno" },
-            { t: "Pôr do Sol em Marte", u: "https://images-assets.nasa.gov/image/PIA19401/PIA19401~orig.jpg", d: "Rover Curiosity" },
+            { t: "Pilares da Criação", u: "https://images-assets.nasa.gov/image/PIA23645/PIA23645~orig.jpg", d: "Hubble" },
+            { t: "Anéis de Saturno", u: "https://images-assets.nasa.gov/image/PIA06240/PIA06240~orig.jpg", d: "Cassini" },
+            { t: "Nascer da Terra", u: "https://images-assets.nasa.gov/image/as08-14-2383/as08-14-2383~orig.jpg", d: "Apollo 8" },
+            { t: "Turbilhões em Júpiter", u: "https://images-assets.nasa.gov/image/PIA21971/PIA21971~orig.jpg", d: "Juno" },
+            { t: "Pôr do Sol em Marte", u: "https://images-assets.nasa.gov/image/PIA19401/PIA19401~orig.jpg", d: "Curiosity" },
             { t: "Plutão em Cores", u: "https://images-assets.nasa.gov/image/PIA19952/PIA19952~orig.jpg", d: "New Horizons" }
         ];
 
@@ -230,45 +296,59 @@
 
         let scene, camera, renderer, raycaster, mouse, planets = [], labels = [], isSandbox = false, selectedPlanet = null, isDragging = false, currentQuiz = 0;
 
+        /**
+         * Cria etiquetas de texto ULTRA visíveis
+         */
         function createTextLabel(text, size) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 1024; canvas.height = 256;
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillStyle = 'rgba(0,0,0,0.75)';
             ctx.beginPath(); ctx.roundRect(0, 40, 1024, 176, 80); ctx.fill();
-            ctx.font = 'Bold 150px Segoe UI, sans-serif'; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.8)'; ctx.shadowBlur = 30; ctx.fillText(text.toUpperCase(), 512, 128);
+            ctx.font = 'Bold 160px Segoe UI, sans-serif'; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(255, 255, 255, 1)'; ctx.shadowBlur = 40; ctx.fillText(text.toUpperCase(), 512, 128);
             const texture = new THREE.CanvasTexture(canvas);
             const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-            const labelScale = Math.max(120, size * 4.5);
+            const labelScale = Math.max(280, size * 5);
             sprite.scale.set(labelScale, labelScale / 4, 1);
             return sprite;
         }
 
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 30000);
-            camera.position.set(0, 3000, 4500);
+            // Câmara ajustada para ver o sistema solar ultra gigante
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 60000);
+            camera.position.set(0, 6000, 10000);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-            const sunLight = new THREE.PointLight(0xffffff, 6, 12000); scene.add(sunLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+            const sunLight = new THREE.PointLight(0xffffff, 8, 20000); scene.add(sunLight);
+
+            // Estrelas de fundo aumentadas
+            const starPoints = [];
+            for (let i = 0; i < 10000; i++) {
+                starPoints.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000));
+            }
+            const starGeo = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(starPoints, 3));
+            scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 4 })));
 
             Object.keys(planetsData).forEach(name => {
                 const data = planetsData[name];
                 const geo = new THREE.SphereGeometry(data.size, 64, 64);
-                let mat = data.isStar ? new THREE.MeshBasicMaterial({ color: data.color }) : new THREE.MeshStandardMaterial({ color: data.color, metalness: 0.1, roughness: 0.4, emissive: data.color, emissiveIntensity: 0.2 });
+                let mat = data.isStar ? new THREE.MeshBasicMaterial({ color: data.color }) : new THREE.MeshStandardMaterial({ color: data.color, metalness: 0.1, roughness: 0.4, emissive: data.color, emissiveIntensity: 0.25 });
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.name = name; mesh.userData = { ...data, angle: Math.random() * Math.PI * 2 };
                 scene.add(mesh); planets.push(mesh);
+                
                 const label = createTextLabel(name, data.size); label.userData = { target: mesh };
                 scene.add(label); labels.push(label);
+                
                 if (!data.parent && !data.isStar) {
                     const pts = []; for(let i = 0; i <= 250; i++) { const a = (i/250)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*data.dist, 0, Math.sin(a)*data.dist)); }
-                    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 })));
+                    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 })));
                 }
             });
 
@@ -349,13 +429,21 @@
                 }
                 p.rotation.y += 0.005;
             });
-            labels.forEach(l => { const target = l.userData.target; const h = target.userData.size + 40; l.position.set(target.position.x, target.position.y + h, target.position.z); });
-            if (!isSandbox) { camera.position.x += (mouse.x * 200 - camera.position.x) * 0.05; camera.position.y += (mouse.y * 200 + 3000 - camera.position.y) * 0.05; camera.lookAt(0, 0, 0); }
+            labels.forEach(l => { 
+                const target = l.userData.target; 
+                const h = target.userData.size + 120; // Espaçamento maior para etiquetas
+                l.position.set(target.position.x, target.position.y + h, target.position.z); 
+            });
+            if (!isSandbox) { 
+                camera.position.x += (mouse.x * 400 - camera.position.x) * 0.05; 
+                camera.position.y += (mouse.y * 400 + 5000 - camera.position.y) * 0.05; 
+                camera.lookAt(0, 0, 0); 
+            }
             renderer.render(scene, camera);
         }
 
         function startExplorer() { isSandbox = false; toggleUI(true, "Explorador", "text-blue-400"); }
-        function startSandbox() { isSandbox = true; toggleUI(true, "Sandbox", "text-purple-400"); document.getElementById('sandbox-hint').classList.remove('hidden'); camera.position.set(0, 6000, 8000); }
+        function startSandbox() { isSandbox = true; toggleUI(true, "Sandbox", "text-purple-400"); document.getElementById('sandbox-hint').classList.remove('hidden'); camera.position.set(0, 12000, 15000); }
         function backToMenu() { document.getElementById('main-menu').classList.remove('hidden'); document.getElementById('ui-layer').classList.add('hidden'); closeDetails(); closeSandboxModal(); closeGallery(); closeQuiz(); document.getElementById('sandbox-hint').classList.add('hidden'); }
         function toggleUI(show, text, color) { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('ui-layer').classList.remove('hidden'); document.getElementById('mode-indicator').innerText = text; document.getElementById('mode-indicator').className = `glass px-6 md:px-12 py-3 md:py-4 rounded-full text-xs md:text-base font-black uppercase tracking-widest ${color} border-white/20 shadow-xl`; }
 
@@ -363,7 +451,7 @@
             const data = planetsData[name]; const img = document.getElementById('detail-img'); img.classList.add('opacity-0');
             document.getElementById('detail-name').innerText = name; document.getElementById('detail-desc').innerText = data.desc;
             document.getElementById('dist-earth').innerText = data.distEarth; document.getElementById('dist-sun').innerText = data.distSun;
-            document.getElementById('detail-type').innerText = data.isStar ? "Estrela" : "Planeta";
+            document.getElementById('detail-type').innerText = data.isStar ? "Estrela Principal" : "Corpo Celeste";
             img.src = data.img; img.onload = () => img.classList.remove('opacity-0');
             document.getElementById('planet-details').classList.remove('translate-x-full');
             const keys = Object.keys(planetsData); const next = (keys.indexOf(name) + 1) % keys.length;
