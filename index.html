@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Comando Estelar: Sistema Solar 3D - Edição Gigante</title>
+    <title>Comando Estelar: Órbitas dos Planetas</title>
+    <!-- Bibliotecas: Tailwind para interface e Three.js para o motor 3D -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -13,10 +14,10 @@
             background-color: #010103; 
             color: white; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            touch-action: manipulation;
+            touch-action: none; 
         }
         canvas { display: block; }
-        .glass { background: rgba(10, 15, 30, 0.95); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); }
+        .glass { background: rgba(10, 15, 30, 0.96); backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.1); }
         .hidden { display: none; }
         #ui-layer { pointer-events: none; }
         #ui-layer * { pointer-events: auto; }
@@ -29,417 +30,347 @@
             transition: transform 0.8s cubic-bezier(0.2, 1, 0.2, 1);
             cursor: zoom-in;
         }
-        .planet-image:hover { transform: scale(1.05); }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-left-color: #fbbf24;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        /* Feedback do Quiz */
+        .correct-answer { background-color: #10b981 !important; border-color: #059669 !important; color: white !important; transform: scale(1.05); transition: all 0.3s; }
+        .wrong-answer { background-color: #ef4444 !important; border-color: #dc2626 !important; color: white !important; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
         }
 
-        .card-anim {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-anim:hover {
-            transform: scale(1.03);
-            border-color: rgba(59, 130, 246, 0.5);
-            background: rgba(20, 30, 60, 0.95);
-        }
-
-        /* Feedback visual do Quiz */
-        .correct-answer { background-color: #10b981 !important; border-color: #059669 !important; color: white !important; transform: scale(1.02); }
-        .wrong-answer { background-color: #ef4444 !important; border-color: #dc2626 !important; color: white !important; }
-
-        /* Estilos para a Visualização Ampliada */
-        #fullscreen-image-view {
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 100;
+        #fullscreen-view {
+            background: rgba(0, 0, 0, 0.99);
+            z-index: 200;
             cursor: zoom-out;
             display: none;
             align-items: center;
             justify-content: center;
         }
-        #fullscreen-image-view img {
-            max-width: 95%;
-            max-height: 90vh;
-            border-radius: 1rem;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+        #fullscreen-view img {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 2rem;
+            border: 6px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 150px rgba(0,0,0,1);
         }
 
-        /* Ajustes para TV e Mobile */
-        @media (min-width: 1920px) {
-            h1 { font-size: 8rem !important; }
-            .text-2xl { font-size: 2rem !important; }
-            .p-8 { padding: 3rem !important; }
-        }
+        .card-anim { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-anim:hover { transform: scale(1.05); border-color: rgba(251, 191, 36, 0.5); }
     </style>
 </head>
 <body>
 
-    <!-- VISUALIZAÇÃO DE IMAGEM EM ECRÃ INTEIRO -->
-    <div id="fullscreen-image-view" class="fixed inset-0 flex flex-col" onclick="closeFullscreenImage()">
-        <div class="absolute top-8 right-8 text-white text-4xl font-bold bg-white/10 w-16 h-16 flex items-center justify-center rounded-full glass">✕</div>
-        <img id="enlarged-img" src="" alt="Imagem Ampliada">
-        <p id="enlarged-caption" class="mt-6 text-2xl font-black uppercase tracking-widest text-blue-400"></p>
+    <!-- VISUALIZAÇÃO AMPLIADA -->
+    <div id="fullscreen-view" class="fixed inset-0 flex flex-col p-6" onclick="closeFullscreen()">
+        <div class="absolute top-10 right-10 text-white text-6xl font-bold bg-white/10 w-24 h-24 flex items-center justify-center rounded-full glass border-2 border-white/20">✕</div>
+        <img id="enlarged-img" src="" alt="Astro Super Detalhado">
+        <p id="enlarged-caption" class="mt-10 text-5xl font-black uppercase tracking-widest text-yellow-400 text-center"></p>
     </div>
 
-    <!-- MENU PRINCIPAL: CENTRO DE COMANDO -->
-    <div id="main-menu" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 md:p-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black overflow-y-auto">
-        <div class="max-w-7xl w-full py-10">
-            <header class="text-center mb-8 md:mb-16">
-                <h1 class="text-5xl md:text-8xl font-black mb-4 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent uppercase tracking-tighter italic text-balance">Comando Estelar</h1>
-                <p class="text-blue-300/60 text-lg md:text-2xl font-light tracking-widest uppercase">Módulo de Aprendizagem Interplanetária</p>
+    <!-- MENU PRINCIPAL -->
+    <div id="main-menu" class="fixed inset-0 z-50 flex flex-col items-center justify-start p-6 md:p-12 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-black to-black overflow-y-auto text-center">
+        <div class="max-w-7xl w-full py-12">
+            <header class="mb-16">
+                <h1 class="text-7xl md:text-9xl font-black mb-6 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent uppercase tracking-tighter italic">Comando Estelar</h1>
+                <p class="text-blue-300 text-3xl md:text-4xl font-light tracking-[0.4em] uppercase text-balance">Edição de Impacto Máximo</p>
             </header>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-                <!-- CARD 1: EXPLORADOR -->
-                <div onclick="startExplorer()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
-                    <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1446941611757-91d2c3bd3d45?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-blue-500/20"></div>
-                    <h3 class="text-2xl font-bold mb-2 text-blue-400">01. Explorador</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Viagem guiada com astros gigantes e imagens reais de alta definição.</p>
-                    <span class="text-blue-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Aceder Sistema →</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div onclick="startExplorer()" class="glass p-10 rounded-[4rem] cursor-pointer card-anim border-4 border-transparent hover:border-blue-500 group flex flex-col shadow-2xl">
+                    <div class="h-64 w-full mb-8 rounded-[3rem] bg-[url('https://images.unsplash.com/photo-1446941611757-91d2c3bd3d45?q=80&w=800')] bg-cover bg-center text-center text-balance text-center"></div>
+                    <h3 class="text-4xl font-black mb-4 text-blue-400 uppercase">Explorador</h3>
+                    <p class="text-gray-300 text-2xl leading-relaxed mb-8 flex-grow font-medium text-balance">Navegação guiada com astros gigantescos e detalhados.</p>
+                    <span class="bg-blue-600 text-white font-black py-6 rounded-3xl text-3xl uppercase tracking-widest group-hover:bg-blue-500 transition">Entrar</span>
                 </div>
 
-                <!-- CARD 2: SANDBOX -->
-                <div onclick="startSandbox()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
-                    <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-purple-500/20"></div>
-                    <h3 class="text-2xl font-bold mb-2 text-purple-400">02. Sandbox</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Simulador de gravidade. Reposicione os astros massivos no laboratório.</p>
-                    <span class="text-purple-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Iniciar Lab →</span>
+                <div onclick="startSandbox()" class="glass p-10 rounded-[4rem] cursor-pointer card-anim border-4 border-transparent hover:border-purple-500 group flex flex-col shadow-2xl">
+                    <div class="h-64 w-full mb-8 rounded-[3rem] bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800')] bg-cover bg-center"></div>
+                    <h3 class="text-4xl font-black mb-4 text-purple-400 uppercase">Órbitas dos Planetas</h3>
+                    <p class="text-gray-300 text-2xl leading-relaxed mb-8 flex-grow font-medium text-balance">Posiciona o rato sobre os astros para ver curiosidades.</p>
+                    <span class="bg-purple-600 text-white font-black py-6 rounded-3xl text-3xl uppercase tracking-widest group-hover:bg-purple-500 transition">Simular</span>
                 </div>
 
-                <!-- CARD 3: GALERIA -->
-                <div onclick="openGallery()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
-                    <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-yellow-500/20"></div>
-                    <h3 class="text-2xl font-bold mb-2 text-yellow-500">03. Galeria NASA</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Arquivos visuais das missões espaciais mais famosas da história.</p>
-                    <span class="text-yellow-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Ver Arquivos →</span>
+                <div onclick="openGallery()" class="glass p-10 rounded-[4rem] cursor-pointer card-anim border-4 border-transparent hover:border-yellow-500 group flex flex-col shadow-2xl">
+                    <div class="h-64 w-full mb-8 rounded-[3rem] bg-[url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800')] bg-cover bg-center text-center"></div>
+                    <h3 class="text-4xl font-black mb-4 text-yellow-500 uppercase">Galeria</h3>
+                    <p class="text-gray-300 text-2xl leading-relaxed mb-8 flex-grow font-medium text-balance">Explora arquivos visuais em alta resolução da NASA.</p>
+                    <span class="bg-yellow-600 text-black font-black py-6 rounded-3xl text-3xl uppercase tracking-widest group-hover:bg-yellow-500 transition">Ver Fotos</span>
                 </div>
 
-                <!-- CARD 4: QUIZ -->
-                <div onclick="openQuiz()" class="glass p-6 md:p-8 rounded-[2rem] cursor-pointer card-anim border-2 border-transparent group flex flex-col h-full">
-                    <div class="h-40 md:h-48 w-full mb-6 rounded-2xl bg-[url('https://images.unsplash.com/photo-1606326666390-4e48dbe1fd5f?q=80&w=600')] bg-cover bg-center shadow-lg group-hover:shadow-emerald-500/20"></div>
-                    <h3 class="text-2xl font-bold mb-2 text-emerald-400">04. Desafio</h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 flex-grow">Teste os seus conhecimentos e conquiste a sua patente espacial.</p>
-                    <span class="text-emerald-500 font-bold text-xs uppercase tracking-widest group-hover:text-white transition mt-auto">Começar Teste →</span>
+                <div onclick="openQuiz()" class="glass p-10 rounded-[4rem] cursor-pointer card-anim border-4 border-transparent hover:border-emerald-500 group flex flex-col shadow-2xl">
+                    <div class="h-64 w-full mb-8 rounded-[3rem] bg-[url('https://images.unsplash.com/photo-1606326666390-4e48dbe1fd5f?q=80&w=800')] bg-cover bg-center"></div>
+                    <h3 class="text-4xl font-black mb-4 text-emerald-400 uppercase">Desafio</h3>
+                    <p class="text-gray-300 text-2xl leading-relaxed mb-8 flex-grow font-medium text-balance">Testa os teus conhecimentos com o desafio astral.</p>
+                    <span class="bg-emerald-600 text-white font-black py-6 rounded-3xl text-3xl uppercase tracking-widest group-hover:bg-emerald-500 transition">Jogar</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- UI LAYER: OVERLAYS -->
+    <!-- UI LAYER -->
     <div id="ui-layer" class="fixed inset-0 z-40 hidden">
-        <div class="p-4 md:p-8 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
-            <button onclick="backToMenu()" class="glass px-6 py-3 rounded-full hover:bg-white/10 transition-all font-bold text-white flex items-center gap-2 text-sm md:text-base">
-                <span>◀</span> <span class="hidden md:inline">Retornar ao</span> Centro
+        <div class="p-8 md:p-12 flex justify-between items-center bg-gradient-to-b from-black to-transparent">
+            <button id="btn-back" onclick="backToMenu()" class="glass px-12 py-6 rounded-full hover:bg-white/20 transition-all font-black text-3xl text-white border-4 border-white/10">
+                ◀ MENU
             </button>
-            <div id="mode-indicator" class="glass px-6 md:px-12 py-3 md:py-4 rounded-full text-xs md:text-base font-black uppercase tracking-widest text-blue-400 border border-blue-500/30">Explorador</div>
+            <div id="mode-indicator" class="glass px-16 py-6 rounded-full text-3xl font-black uppercase tracking-widest text-yellow-500 border-4 border-yellow-500/40 shadow-2xl">EXPLORADOR</div>
         </div>
 
-        <!-- OVERLAY: GALERIA -->
-        <div id="gallery-overlay" class="hidden absolute inset-0 bg-black/95 p-6 md:p-12 overflow-y-auto scrollbar-hide z-50">
-            <div class="max-w-6xl mx-auto">
-                <div class="flex justify-between items-center mb-8 md:mb-12">
-                    <h2 class="text-3xl md:text-5xl font-black italic uppercase tracking-tighter">Arquivos Visuais NASA</h2>
-                    <button onclick="closeGallery()" class="text-3xl text-gray-400 hover:text-white p-2">✕</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8" id="gallery-grid">
-                </div>
-            </div>
-        </div>
-
-        <!-- OVERLAY: QUIZ -->
-        <div id="quiz-overlay" class="hidden absolute inset-0 bg-black/95 flex items-center justify-center p-4 z-50">
-            <div class="glass max-w-2xl w-full p-6 md:p-12 rounded-[2.5rem] md:rounded-[3rem] border border-emerald-500/30 text-center overflow-y-auto max-h-[90vh]">
-                <h2 class="text-3xl md:text-4xl font-black mb-6 md:mb-8 text-emerald-400 uppercase tracking-widest">Desafio Astral</h2>
-                
-                <div id="quiz-container">
-                    <p id="quiz-question" class="text-xl md:text-2xl mb-8 font-medium leading-relaxed italic text-gray-200"></p>
-                    <div class="grid grid-cols-1 gap-3 md:gap-4" id="quiz-options">
-                    </div>
-                    <button onclick="backToMenu()" class="mt-10 text-gray-500 hover:text-white text-xs uppercase tracking-widest font-bold transition-colors">Abortar e Sair</button>
-                </div>
-
-                <div id="quiz-result" class="hidden">
-                    <div class="text-6xl mb-6">🏆</div>
-                    <p class="text-3xl font-black text-white mb-2">Missão Concluída!</p>
-                    <p class="text-gray-400 mb-10 italic text-lg">Excelente prestação, Cadete.</p>
-                    <div class="flex flex-col gap-4">
-                        <button onclick="openQuiz()" class="bg-emerald-600 hover:bg-emerald-500 px-10 py-5 rounded-2xl font-bold text-xl transition-all">Tentar Novamente</button>
-                        <button onclick="backToMenu()" class="text-gray-400 hover:text-white underline transition-colors">Voltar ao Centro de Comando</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SANDBOX: MODAL DE CURIOSIDADES -->
-        <div id="sandbox-modal" class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-xl glass p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-purple-500/30 shadow-2xl z-50">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="sandbox-planet-name" class="text-2xl md:text-3xl font-black text-purple-400 uppercase tracking-tighter"></h3>
-                <button onclick="closeSandboxModal()" class="text-gray-400 p-1">✕</button>
-            </div>
-            <div class="flex gap-4 md:gap-6 items-center">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shrink-0">🛰️</div>
-                <p id="sandbox-planet-curiosity" class="text-gray-200 text-base md:text-lg leading-relaxed italic"></p>
-            </div>
-        </div>
-
-        <!-- EXPLORADOR: DETALHES -->
-        <div id="planet-details" class="absolute right-0 top-0 h-full w-full md:w-[600px] glass p-6 md:p-12 transform translate-x-full transition-transform duration-700 overflow-y-auto scrollbar-hide border-l border-white/10 z-50">
-            <button onclick="closeDetails()" class="mb-6 md:mb-10 text-gray-400 hover:text-white flex items-center gap-4 font-black text-lg">✕ Fechar</button>
-            <h2 id="detail-name" class="text-5xl md:text-7xl font-black mb-2 text-white tracking-tighter uppercase text-balance"></h2>
-            <p id="detail-type" class="text-blue-400 font-black mb-6 md:mb-10 italic uppercase text-xs tracking-widest"></p>
+        <div id="planet-details" class="absolute right-0 top-0 h-full w-full md:w-[850px] glass p-12 md:p-20 transform translate-x-full transition-transform duration-700 overflow-y-auto scrollbar-hide border-l-8 border-white/10 z-50 text-center">
+            <button onclick="closeDetails()" class="mb-16 text-gray-400 hover:text-white flex items-center gap-8 font-black text-4xl">✕ FECHAR</button>
+            <h2 id="detail-name" class="text-8xl md:text-[10rem] font-black mb-4 text-white tracking-tighter uppercase italic text-center"></h2>
+            <p id="detail-type" class="text-blue-400 font-black mb-16 italic uppercase text-3xl tracking-[0.4em] text-center"></p>
             
-            <!-- Imagem clicável para ampliar -->
-            <div onclick="openFullscreenImage()" class="relative w-full aspect-square bg-black/80 rounded-[2.5rem] md:rounded-[3rem] mb-8 md:mb-10 overflow-hidden flex items-center justify-center border-4 border-white/5 group shadow-2xl">
+            <div onclick="openFullscreen()" class="relative w-full aspect-square bg-black/80 rounded-[5rem] mb-16 overflow-hidden flex items-center justify-center border-[12px] border-white/5 shadow-2xl group cursor-pointer text-center">
                 <img id="detail-img" src="" class="planet-image opacity-0 transition-opacity duration-1000">
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span class="text-white font-bold uppercase tracking-tighter bg-black/60 px-6 py-3 rounded-full border border-white/20">Ampliar Imagem 🔍</span>
+                <div class="absolute inset-0 bg-blue-600/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-center">
+                    <span class="text-white font-black text-5xl uppercase bg-black/80 px-12 py-8 rounded-full border-4 border-white/20 shadow-2xl text-center">AMPLIAR 🔍</span>
                 </div>
             </div>
 
-            <div class="space-y-6 md:space-y-8">
-                <div class="bg-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-white/10">
-                    <p id="detail-desc" class="text-gray-200 text-lg md:text-xl leading-relaxed font-medium"></p>
+            <div class="space-y-16">
+                <div class="bg-white/5 p-12 rounded-[4rem] border-4 border-white/10 shadow-inner">
+                    <p id="detail-desc" class="text-white text-4xl leading-relaxed font-medium"></p>
                 </div>
-                <div class="grid grid-cols-2 gap-3 md:gap-4">
-                    <div class="p-4 md:p-6 bg-white/10 rounded-[1.2rem] md:rounded-[1.5rem]">
-                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2 text-balance">Dist. Terra</h4>
-                        <p id="dist-earth" class="text-lg md:text-2xl font-black text-white"></p>
+                <div class="grid grid-cols-2 gap-10 text-center text-balance text-center">
+                    <div class="p-10 bg-white/10 rounded-[3.5rem] border-4 border-white/5">
+                        <h4 class="text-gray-400 text-2xl uppercase mb-4 font-black">Dist. Terra</h4>
+                        <p id="dist-earth" class="text-5xl font-black text-white"></p>
                     </div>
-                    <div class="p-4 md:p-6 bg-white/10 rounded-[1.2rem] md:rounded-[1.5rem]">
-                        <h4 class="text-gray-400 text-[10px] md:text-xs uppercase mb-1 md:mb-2 text-balance">Dist. Sol</h4>
-                        <p id="dist-sun" class="text-lg md:text-2xl font-black text-white"></p>
+                    <div class="p-10 bg-white/10 rounded-[3.5rem] border-4 border-white/5">
+                        <h4 class="text-gray-400 text-2xl uppercase mb-4 font-black">Dist. do Sol</h4>
+                        <p id="dist-sun" class="text-5xl font-black text-white"></p>
                     </div>
                 </div>
-                <button id="next-planet" class="w-full py-5 md:py-6 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black text-xl md:text-2xl text-white transition-all shadow-lg shadow-blue-900/40">Próximo Astro →</button>
+                <button id="next-planet" class="w-full py-12 bg-blue-600 hover:bg-blue-500 rounded-[4rem] font-black text-5xl text-white transition-all shadow-2xl active:scale-95 uppercase tracking-widest">Próximo Astro</button>
             </div>
         </div>
 
-        <div id="sandbox-hint" class="absolute bottom-12 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full hidden border-purple-500/50 shadow-2xl text-sm md:text-lg text-center whitespace-nowrap">
-            ✨ <b>Clica e arrasta</b> os astros para mudar o sistema!
+        <div id="gallery-overlay" class="hidden absolute inset-0 bg-black/99 p-12 overflow-y-auto z-50 text-center">
+            <div class="max-w-[1400px] mx-auto text-center">
+                <div class="flex justify-between items-center mb-20">
+                    <h2 class="text-7xl font-black uppercase tracking-tighter text-yellow-500 italic">Arquivos NASA</h2>
+                    <button onclick="closeGallery()" class="text-8xl text-white">✕</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16" id="gallery-grid"></div>
+            </div>
+        </div>
+
+        <div id="quiz-overlay" class="hidden absolute inset-0 bg-black/99 flex items-center justify-center p-6 z-50 text-center text-balance">
+            <div class="glass max-w-6xl w-full p-16 rounded-[5rem] border-8 border-emerald-500/20 text-center shadow-2xl overflow-y-auto max-h-[95vh]">
+                <h2 class="text-6xl font-black mb-16 text-emerald-400 uppercase tracking-[0.2em] italic text-center">Desafio Astral</h2>
+                <div id="quiz-container">
+                    <p id="quiz-question" class="text-5xl mb-16 font-bold leading-tight text-white text-center"></p>
+                    <div class="grid grid-cols-1 gap-8" id="quiz-options"></div>
+                    <button onclick="backToMenu()" class="mt-20 text-gray-500 hover:text-white text-3xl uppercase font-black transition-colors underline text-center">Abortar Missão</button>
+                </div>
+                <div id="quiz-result" class="hidden text-center text-balance">
+                    <div class="text-[12rem] mb-12">🎖️</div>
+                    <p class="text-7xl font-black text-white mb-8 uppercase text-center">Nível Mestre!</p>
+                    <button onclick="openQuiz()" class="bg-emerald-600 py-10 px-20 rounded-[3rem] font-black text-5xl text-white shadow-2xl hover:bg-emerald-500 transition-all text-center">REPETIR</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="canvas-container"></div>
 
     <script>
+        /**
+         * DADOS DAS ENTIDADES
+         */
         const planetsData = {
-            "Sol": { 
-                color: 0xffcc00, size: 250, dist: 0, speed: 0, 
-                desc: "O Sol é uma estrela anã amarela que contém 99,8% de toda a massa do sistema solar. É o motor de luz e calor para todos os planetas.", 
-                curiosidade: "A luz solar demora cerca de 8 minutos e 20 segundos para chegar à Terra.", 
-                distSun: "0 km", distEarth: "149.6M km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg", 
-                isStar: true 
-            },
-            "Mercúrio": { 
-                color: 0xaaaaaa, size: 100, dist: 650, speed: 0.02, 
-                desc: "O planeta mais próximo do Sol. Apesar de pequeno, é extremamente denso e veloz na sua órbita.", 
-                curiosidade: "Um ano em Mercúrio dura apenas 88 dias terrestres.", 
-                distSun: "57.9M km", distEarth: "91.7M km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg" 
-            },
-            "Vénus": { 
-                color: 0xe3bb76, size: 110, dist: 1000, speed: 0.01, 
-                desc: "O planeta mais quente devido ao efeito estufa extremo da sua atmosfera densa de CO2.", 
-                curiosidade: "Vénus gira na direção oposta à maioria dos planetas.", 
-                distSun: "108.2M km", distEarth: "41.4M km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg" 
-            },
-            "Terra": { 
-                color: 0x2266ff, size: 120, dist: 1400, speed: 0.007, 
-                desc: "A nossa casa. Único local conhecido com água líquida em abundância e vida complexa.", 
-                curiosidade: "A Terra é o único planeta que não tem o nome de um deus grego ou romano.", 
-                distSun: "149.6M km", distEarth: "0 km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" 
-            },
-            "Lua": { 
-                color: 0xcccccc, size: 40, dist: 180, speed: 0.04, parent: "Terra", 
-                desc: "O satélite natural da Terra. Responsável pelas marés e por estabilizar o eixo do nosso planeta.", 
-                curiosidade: "A Lua afasta-se da Terra cerca de 3,8 cm todos os anos.", 
-                distSun: "149.6M km", distEarth: "384 mil km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" 
-            },
-            "Marte": { 
-                color: 0xff4422, size: 110, dist: 1900, speed: 0.005, 
-                desc: "O planeta vermelho. Casa do Monte Olimpo, o vulcão mais alto de todo o sistema solar.", 
-                curiosidade: "Em Marte, o pôr do sol tem uma tonalidade azul.", 
-                distSun: "227.9M km", distEarth: "78.3M km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg" 
-            },
-            "Júpiter": { 
-                color: 0xd39c7e, size: 180, dist: 2600, speed: 0.003, 
-                desc: "O gigante gasoso. Tão massivo que poderia conter todos os outros planetas no seu interior duas vezes.", 
-                curiosidade: "Júpiter tem uma tempestade maior que a Terra ativa há centenas de anos.", 
-                distSun: "778.5M km", distEarth: "628.7M km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg" 
-            },
-            "Saturno": { 
-                color: 0xc5ab6e, size: 160, dist: 3400, speed: 0.0015, 
-                desc: "A joia do sistema solar. Famoso pelos seus anéis majestosos feitos de gelo e poeira espacial.", 
-                curiosidade: "Saturno é tão pouco denso que flutuaria se houvesse um oceano gigante.", 
-                distSun: "1.4B km", distEarth: "1.2B km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg" 
-            },
-            "Urano": { 
-                color: 0xb5e1e1, size: 140, dist: 4200, speed: 0.0008, 
-                desc: "O gigante gelado que orbita de lado. A sua cor ciano vem do metano na sua atmosfera gélida.", 
-                curiosidade: "Em Urano, chovem diamantes nas profundezas da sua atmosfera.", 
-                distSun: "2.8B km", distEarth: "2.6B km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg" 
-            },
-            "Neptuno": { 
-                color: 0x4b70dd, size: 140, dist: 5000, speed: 0.0005, 
-                desc: "O mundo dos ventos supersónicos. É o planeta mais distante e um dos mais frios que conhecemos.", 
-                curiosidade: "Neptuno foi descoberto primeiro através de cálculos matemáticos.", 
-                distSun: "4.5B km", distEarth: "4.3B km", 
-                img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg" 
-            }
+            "Sol": { color: 0xffcc00, size: 6000, dist: 0, speed: 0, desc: "A nossa estrela central que mantém o sistema solar unido. Contém 99,8% de toda a massa do sistema.", curiosidade: "O Sol é tão grande que 1,3 milhões de Terras caberiam no seu interior.", distSun: "0 km", distEarth: "150M km", img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg", isStar: true },
+            "Mercúrio": { color: 0xaaaaaa, size: 3000, dist: 25000, speed: 0.006, desc: "O planeta mais próximo do Sol e o mais rápido a completar uma órbita.", curiosidade: "Um ano em Mercúrio dura apenas 88 dias terrestres.", distSun: "58M km", distEarth: "92M km", img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg" },
+            "Vénus": { color: 0xe3bb76, size: 3200, dist: 40000, speed: 0.004, desc: "Conhecido como o planeta gémeo da Terra, é o mundo mais quente do sistema.", curiosidade: "Em Vénus, o Sol nasce no oeste e põe-se no leste.", distSun: "108M km", distEarth: "41M km", img: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg" },
+            "Terra": { color: 0x2266ff, size: 3400, dist: 55000, speed: 0.003, desc: "O nosso lar azul, o único planeta conhecido por abrigar vida complexa.", curiosidade: "A Terra é o único planeta cujo nome não vem de deuses romanos.", distSun: "150M km", distEarth: "0 km", img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" },
+            "Lua": { color: 0xcccccc, size: 1000, dist: 6500, speed: 0.015, parent: "Terra", desc: "O satélite natural da Terra que influencia as marés e o nosso eixo.", curiosidade: "A Lua afasta-se cerca de 3,8 centímetros da Terra todos os anos.", distSun: "150M km", distEarth: "384k km", img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" },
+            "Marte": { color: 0xff4422, size: 3100, dist: 75000, speed: 0.002, desc: "O planeta vermelho, casa do Monte Olimpo, o vulcão mais alto do sistema solar.", curiosidade: "Em Marte, o pôr do sol é azul devido à poeira na atmosfera.", distSun: "228M km", distEarth: "78M km", img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg" },
+            "Júpiter": { color: 0xd39c7e, size: 4800, dist: 100000, speed: 0.001, desc: "O maior planeta do sistema solar, um gigante gasoso com dezenas de luas.", curiosidade: "Júpiter tem uma tempestade maior que a Terra ativa há 300 anos.", distSun: "778M km", distEarth: "628M km", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg" },
+            "Saturno": { color: 0xc5ab6e, size: 4200, dist: 130000, speed: 0.0007, desc: "Famoso pelos seus magníficos anéis de gelo, Saturno é o planeta menos denso.", curiosidade: "Saturno flutuaria na água se houvesse uma piscina gigante.", distSun: "1.4B km", distEarth: "1.2B km", img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg" },
+            "Urano": { color: 0xb5e1e1, size: 3800, dist: 160000, speed: 0.0004, desc: "Um gigante de gelo que orbita o Sol deitado em relação ao seu eixo.", curiosidade: "Nas profundezas de Urano, as pressões fazem chover diamantes.", distSun: "2.8B km", distEarth: "2.6B km", img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg" },
+            "Neptuno": { color: 0x4b70dd, size: 3800, dist: 190000, speed: 0.0003, desc: "O mundo azul dos ventos mais velozes do sistema solar.", curiosidade: "Neptuno foi descoberto matematicamente antes de ser visto por telescópio.", distSun: "4.5B km", distEarth: "4.3B km", img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg" }
         };
 
         const galleryData = [
             { t: "Pilares da Criação", u: "https://images-assets.nasa.gov/image/PIA23645/PIA23645~orig.jpg", d: "Hubble" },
+            { t: "Olho de Júpiter", u: "https://images-assets.nasa.gov/image/PIA21971/PIA21971~orig.jpg", d: "Juno" },
             { t: "Anéis de Saturno", u: "https://images-assets.nasa.gov/image/PIA06240/PIA06240~orig.jpg", d: "Cassini" },
-            { t: "Nascer da Terra", u: "https://images-assets.nasa.gov/image/as08-14-2383/as08-14-2383~orig.jpg", d: "Apollo 8" },
-            { t: "Turbilhões em Júpiter", u: "https://images-assets.nasa.gov/image/PIA21971/PIA21971~orig.jpg", d: "Juno" },
-            { t: "Pôr do Sol em Marte", u: "https://images-assets.nasa.gov/image/PIA19401/PIA19401~orig.jpg", d: "Curiosity" },
-            { t: "Plutão em Cores", u: "https://images-assets.nasa.gov/image/PIA19952/PIA19952~orig.jpg", d: "New Horizons" }
+            { t: "O Lar Azul", u: "https://images-assets.nasa.gov/image/as08-14-2383/as08-14-2383~orig.jpg", d: "Apollo 8" }
         ];
 
         const quizData = [
-            { q: "Qual o planeta com os anéis mais visíveis?", a: ["Saturno", "Júpiter", "Marte", "Terra"], r: 0 },
-            { q: "O Sol é classificado como qual tipo de astro?", a: ["Planeta", "Cometa", "Estrela", "Buraco Negro"], r: 2 },
-            { q: "Em qual planeta chovem diamantes?", a: ["Vénus", "Urano", "Mercúrio", "Lua"], r: 1 },
-            { q: "Qual o nome da nossa galáxia?", a: ["Andrómeda", "Via Láctea", "Sombrero", "Triângulo"], r: 1 },
+            { q: "Qual o maior objeto do nosso sistema solar?", a: ["Júpiter", "Sol", "Saturno", "Terra"], r: 1 },
+            { q: "Em qual planeta a temperatura é mais alta?", a: ["Mercúrio", "Marte", "Vénus", "Sol"], r: 2 },
+            { q: "Qual planeta gira deitado na sua órbita?", a: ["Neptuno", "Urano", "Saturno", "Vénus"], r: 1 },
             { q: "Qual o planeta conhecido como Planeta Vermelho?", a: ["Vénus", "Marte", "Júpiter", "Neptuno"], r: 1 }
         ];
 
         let scene, camera, renderer, raycaster, mouse, planets = [], labels = [], isSandbox = false, selectedPlanet = null, isDragging = false, currentQuiz = 0;
+        let curiositySprite = null; 
 
-        function createTextLabel(text, size) {
+        // Controlo de Zoom
+        let targetZoom = 350000;
+        let currentZoom = 350000;
+        let pinchDist = 0;
+
+        function createTextLabel(text, size, color = '#ffcc00', isCuriosity = false) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 1024; canvas.height = 256;
-            ctx.fillStyle = 'rgba(0,0,0,0.75)';
-            ctx.beginPath(); ctx.roundRect(0, 40, 1024, 176, 80); ctx.fill();
-            ctx.font = 'Bold 160px Segoe UI, sans-serif'; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(255, 255, 255, 1)'; ctx.shadowBlur = 40; ctx.fillText(text.toUpperCase(), 512, 128);
+            const fontSize = isCuriosity ? 160 : 220;
+            ctx.font = `Bold ${fontSize}px Segoe UI, sans-serif`;
+            
+            const words = text.toUpperCase().split(' ');
+            let lines = [];
+            let currentLine = words[0];
+            const maxW = isCuriosity ? 2200 : 3000;
+
+            if (isCuriosity) {
+                for (let i = 1; i < words.length; i++) {
+                    if (ctx.measureText(currentLine + " " + words[i]).width < maxW) {
+                        currentLine += " " + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+            } else {
+                lines.push(text.toUpperCase());
+            }
+
+            const textWidth = Math.max(...lines.map(l => ctx.measureText(l).width));
+            const padding = 140;
+            canvas.width = textWidth + padding * 2;
+            canvas.height = (fontSize + 40) * lines.length + padding;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.92)';
+            ctx.beginPath();
+            const r = 100;
+            ctx.moveTo(r, 0); ctx.lineTo(canvas.width - r, 0); ctx.quadraticCurveTo(canvas.width, 0, canvas.width, r);
+            ctx.lineTo(canvas.width, canvas.height - r); ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - r, canvas.height);
+            ctx.lineTo(r, canvas.height); ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - r);
+            ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+            ctx.fill();
+
+            ctx.font = `Bold ${fontSize}px Segoe UI, sans-serif`;
+            ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'black'; ctx.shadowBlur = 40;
+            
+            lines.forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, padding/2 + fontSize/2 + i * (fontSize + 40));
+            });
+            
             const texture = new THREE.CanvasTexture(canvas);
             const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-            const labelScale = Math.max(280, size * 5);
-            sprite.scale.set(labelScale, labelScale / 4, 1);
+            const aspect = canvas.width / canvas.height;
+            const baseH = isCuriosity ? 18000 : (size > 4000 ? 12000 : 18000); 
+            sprite.scale.set(baseH * aspect, baseH, 1);
             return sprite;
         }
 
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 60000);
-            camera.position.set(0, 6000, 10000);
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 100, 4000000);
+            camera.position.set(0, 150000, currentZoom);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-            const sunLight = new THREE.PointLight(0xffffff, 8, 20000); scene.add(sunLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 3.5));
+            const sunLight = new THREE.PointLight(0xffffff, 25, 2000000); scene.add(sunLight);
 
             const starPoints = [];
-            for (let i = 0; i < 10000; i++) {
-                starPoints.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000));
-            }
-            const starGeo = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(starPoints, 3));
-            scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 4 })));
+            for (let i = 0; i < 8000; i++) starPoints.push(THREE.MathUtils.randFloatSpread(1500000), THREE.MathUtils.randFloatSpread(1500000), THREE.MathUtils.randFloatSpread(1500000));
+            scene.add(new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(starPoints, 3)), new THREE.PointsMaterial({ color: 0xffffff, size: 1200 })));
 
             Object.keys(planetsData).forEach(name => {
                 const data = planetsData[name];
-                const geo = new THREE.SphereGeometry(data.size, 64, 64);
-                let mat = data.isStar ? new THREE.MeshBasicMaterial({ color: data.color }) : new THREE.MeshStandardMaterial({ color: data.color, metalness: 0.1, roughness: 0.4, emissive: data.color, emissiveIntensity: 0.25 });
-                const mesh = new THREE.Mesh(geo, mat);
+                const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.size, 128, 128), data.isStar ? new THREE.MeshBasicMaterial({ color: data.color }) : new THREE.MeshStandardMaterial({ color: data.color, metalness: 0.1, roughness: 0.2, emissive: data.color, emissiveIntensity: 0.3 }));
                 mesh.name = name; mesh.userData = { ...data, angle: Math.random() * Math.PI * 2 };
                 scene.add(mesh); planets.push(mesh);
-                
                 const label = createTextLabel(name, data.size); label.userData = { target: mesh };
                 scene.add(label); labels.push(label);
-                
                 if (!data.parent && !data.isStar) {
-                    const pts = []; for(let i = 0; i <= 250; i++) { const a = (i/250)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*data.dist, 0, Math.sin(a)*data.dist)); }
-                    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 })));
+                    const pts = []; for(let i = 0; i <= 360; i++) { const a = (i/360)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*data.dist, 0, Math.sin(a)*data.dist)); }
+                    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 })));
                 }
             });
 
+            curiositySprite = createTextLabel("Posiciona o rato sobre um astro!", 0, '#a855f7', true);
+            curiositySprite.position.set(0, 0, 240000); 
+            curiositySprite.visible = false;
+            scene.add(curiositySprite);
+
             raycaster = new THREE.Raycaster(); mouse = new THREE.Vector2();
             window.addEventListener('resize', onResize);
+            window.addEventListener('wheel', (e) => { targetZoom += e.deltaY * 200; targetZoom = Math.max(50000, Math.min(targetZoom, 1500000)); }, {passive: false});
             window.addEventListener('mousedown', onMouseDown); window.addEventListener('mousemove', onMouseMove); window.addEventListener('mouseup', () => { isDragging = false; selectedPlanet = null; });
             window.addEventListener('touchstart', onTouchStart, {passive: false});
             window.addEventListener('touchmove', onTouchMove, {passive: false});
-            window.addEventListener('touchend', () => { isDragging = false; selectedPlanet = null; });
             animate();
         }
 
-        function onResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        function onResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+        function updateCoords(x, y) { mouse.x = (x / window.innerWidth) * 2 - 1; mouse.y = -(y / window.innerHeight) * 2 + 1; }
 
-        function updateMouse(x, y) {
-            mouse.x = (x / window.innerWidth) * 2 - 1;
-            mouse.y = -(y / window.innerHeight) * 2 + 1;
+        function onTouchStart(e) { if (e.touches.length === 2) { pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); } else { updateCoords(e.touches[0].clientX, e.touches[0].clientY); checkClick(); } }
+        function onTouchMove(e) { if (e.touches.length === 2) { const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); targetZoom -= (dist - pinchDist) * 1500; pinchDist = dist; targetZoom = Math.max(50000, Math.min(targetZoom, 1500000)); } else if (isDragging && selectedPlanet) { updateCoords(e.touches[0].clientX, e.touches[0].clientY); performDrag(); } e.preventDefault(); }
+        
+        function onMouseDown(e) { 
+            updateCoords(e.clientX, e.clientY); 
+            // Ao clicar, a curiosidade desaparece imediatamente
+            if (isSandbox) curiositySprite.visible = false;
+            checkClick(); 
         }
-
-        function onTouchStart(e) {
-            updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-            checkIntersects();
-        }
-
-        function onTouchMove(e) {
-            updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-            if (isDragging) e.preventDefault();
-        }
-
-        function onMouseDown(event) {
-            updateMouse(event.clientX, event.clientY);
-            checkIntersects();
-        }
-
-        function checkIntersects() {
+        
+        function checkClick() {
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(planets);
             if (intersects.length > 0) {
                 const target = intersects[0].object;
-                if (isSandbox) { 
-                    selectedPlanet = target; 
-                    isDragging = true; 
-                    showSandboxCuriosity(target.name);
-                } else {
-                    showPlanetDetails(target.name);
-                }
+                if (isSandbox) { selectedPlanet = target; isDragging = true; }
+                else { showPlanetDetails(target.name); }
             }
         }
 
-        function onMouseMove(event) {
-            updateMouse(event.clientX, event.clientY);
-            if (isDragging && selectedPlanet) {
-                raycaster.setFromCamera(mouse, camera);
-                const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-                const point = new THREE.Vector3();
-                raycaster.ray.intersectPlane(plane, point);
-                selectedPlanet.position.copy(point);
-                if (!selectedPlanet.userData.isStar) selectedPlanet.userData.dist = point.length();
-                return;
-            }
+        function onMouseMove(e) {
+            updateCoords(e.clientX, e.clientY);
+            if (isDragging && selectedPlanet) { performDrag(); return; }
+            
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(planets);
+            
+            if (isSandbox && !isDragging) {
+                if (intersects.length > 0) {
+                    const target = intersects[0].object;
+                    updateSandboxCuriosity(target.name);
+                } else {
+                    // Opcional: mostrar mensagem padrão quando não estiver sobre nada
+                    // updateSandboxCuriosity(null);
+                }
+            }
+
             document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
+        }
+
+        function performDrag() {
+            raycaster.setFromCamera(mouse, camera);
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+            const point = new THREE.Vector3(); raycaster.ray.intersectPlane(plane, point);
+            selectedPlanet.position.copy(point);
+            if (!selectedPlanet.userData.isStar) selectedPlanet.userData.dist = point.length();
         }
 
         function animate() {
             requestAnimationFrame(animate);
+            currentZoom += (targetZoom - currentZoom) * 0.1;
+            camera.position.z = currentZoom;
+
             planets.forEach(p => {
                 const d = p.userData;
                 if (d.isStar) { if (!isDragging || selectedPlanet !== p) p.position.set(0, 0, 0); }
@@ -447,104 +378,83 @@
                     if (d.parent) { const parent = planets.find(pl => pl.name === d.parent); d.angle += d.speed; p.position.x = parent.position.x + Math.cos(d.angle) * d.dist; p.position.z = parent.position.z + Math.sin(d.angle) * d.dist; }
                     else { d.angle += d.speed; p.position.x = Math.cos(d.angle) * d.dist; p.position.z = Math.sin(d.angle) * d.dist; }
                 }
-                p.rotation.y += 0.005;
+                p.rotation.y += 0.006;
             });
+
             labels.forEach(l => { 
                 const target = l.userData.target; 
-                const h = target.userData.size + 120;
-                l.position.set(target.position.x, target.position.y + h, target.position.z); 
+                l.position.set(target.position.x, target.position.y + target.userData.size + 12000, target.position.z); 
             });
+
             if (!isSandbox) { 
-                camera.position.x += (mouse.x * 400 - camera.position.x) * 0.05; 
-                camera.position.y += (mouse.y * 400 + 5000 - camera.position.y) * 0.05; 
-                camera.lookAt(0, 0, 0); 
+                camera.position.x += (mouse.x * 25000 - camera.position.x) * 0.05; 
+                camera.position.y += (mouse.y * 25000 + 150000 - camera.position.y) * 0.05; 
+            } else {
+                camera.position.x = 0;
+                camera.position.y = 150000;
             }
+            camera.lookAt(0, 0, 0);
             renderer.render(scene, camera);
         }
 
-        // FUNÇÕES DE AMPLIAÇÃO DE IMAGEM
-        function openFullscreenImage() {
-            const currentImg = document.getElementById('detail-img').src;
-            const currentName = document.getElementById('detail-name').innerText;
-            document.getElementById('enlarged-img').src = currentImg;
-            document.getElementById('enlarged-caption').innerText = currentName;
-            document.getElementById('fullscreen-image-view').style.display = 'flex';
-        }
-
-        function closeFullscreenImage() {
-            document.getElementById('fullscreen-image-view').style.display = 'none';
-        }
-
-        function startExplorer() { isSandbox = false; toggleUI(true, "Explorador", "text-blue-400"); }
-        function startSandbox() { isSandbox = true; toggleUI(true, "Sandbox", "text-purple-400"); document.getElementById('sandbox-hint').classList.remove('hidden'); camera.position.set(0, 12000, 15000); }
-        function backToMenu() { document.getElementById('main-menu').classList.remove('hidden'); document.getElementById('ui-layer').classList.add('hidden'); closeDetails(); closeSandboxModal(); closeGallery(); closeQuiz(); closeFullscreenImage(); document.getElementById('sandbox-hint').classList.add('hidden'); }
-        function toggleUI(show, text, color) { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('ui-layer').classList.remove('hidden'); document.getElementById('mode-indicator').innerText = text; document.getElementById('mode-indicator').className = `glass px-6 md:px-12 py-3 md:py-4 rounded-full text-xs md:text-base font-black uppercase tracking-widest ${color} border-white/20 shadow-xl`; }
+        function startExplorer() { isSandbox = false; curiositySprite.visible = false; targetZoom = 350000; toggleUI(true, "Explorador", "text-blue-400"); }
+        function startSandbox() { isSandbox = true; curiositySprite.visible = true; targetZoom = 500000; toggleUI(true, "Órbitas dos Planetas", "text-purple-400"); }
+        
+        function backToMenu() { document.getElementById('main-menu').classList.remove('hidden'); document.getElementById('ui-layer').classList.add('hidden'); closeDetails(); closeGallery(); closeQuiz(); closeFullscreen(); }
+        function toggleUI(show, text, color) { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('ui-layer').classList.remove('hidden'); document.getElementById('mode-indicator').innerText = text; document.getElementById('mode-indicator').className = `glass px-12 py-5 rounded-full text-3xl font-black uppercase tracking-widest ${color} border-white/20 shadow-xl text-balance text-center`; }
 
         function showPlanetDetails(name) {
             const data = planetsData[name]; const img = document.getElementById('detail-img'); img.classList.add('opacity-0');
             document.getElementById('detail-name').innerText = name; document.getElementById('detail-desc').innerText = data.desc;
             document.getElementById('dist-earth').innerText = data.distEarth; document.getElementById('dist-sun').innerText = data.distSun;
-            document.getElementById('detail-type').innerText = data.isStar ? "Estrela Principal" : "Corpo Celeste";
+            document.getElementById('detail-type').innerText = data.isStar ? "Estrela Principal" : "Astro do Sistema";
             img.src = data.img; img.onload = () => img.classList.remove('opacity-0');
             document.getElementById('planet-details').classList.remove('translate-x-full');
-            const keys = Object.keys(planetsData); const next = (keys.indexOf(name) + 1) % keys.length;
+            const keys = Object.keys(planetsData); const next = (keys.indexOf(name)+1)%keys.length;
             document.getElementById('next-planet').onclick = () => showPlanetDetails(keys[next]);
         }
-        function closeDetails() { document.getElementById('planet-details').classList.add('translate-x-full'); closeFullscreenImage(); }
-        function showSandboxCuriosity(name) { document.getElementById('sandbox-planet-name').innerText = name; document.getElementById('sandbox-planet-curiosity').innerText = planetsData[name].curiosidade; document.getElementById('sandbox-modal').classList.remove('hidden'); }
-        function closeSandboxModal() { document.getElementById('sandbox-modal').classList.add('hidden'); }
 
+        function updateSandboxCuriosity(name) {
+            if (!name) return;
+            const data = planetsData[name];
+            scene.remove(curiositySprite);
+            curiositySprite = createTextLabel(`${name}: ${data.curiosidade}`, 0, '#a855f7', true);
+            curiositySprite.position.set(0, 0, 240000);
+            curiositySprite.visible = true;
+            scene.add(curiositySprite);
+        }
+
+        function closeDetails() { document.getElementById('planet-details').classList.add('translate-x-full'); }
+        function openFullscreen() { document.getElementById('enlarged-img').src = document.getElementById('detail-img').src; document.getElementById('enlarged-caption').innerText = document.getElementById('detail-name').innerText; document.getElementById('fullscreen-view').style.display = 'flex'; }
+        function closeFullscreen() { document.getElementById('fullscreen-view').style.display = 'none'; }
         function openGallery() {
             const grid = document.getElementById('gallery-grid'); grid.innerHTML = '';
-            galleryData.forEach(item => {
-                grid.innerHTML += `<div class="glass overflow-hidden rounded-[2rem] border border-white/5 group"><img src="${item.u}" class="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition duration-700"><div class="p-4 md:p-6"><h4 class="text-lg md:text-xl font-bold">${item.t}</h4><p class="text-yellow-500 text-[10px] md:text-xs uppercase font-black mt-2">Missão: ${item.d}</p></div></div>`;
-            });
-            document.getElementById('gallery-overlay').classList.remove('hidden');
-            document.getElementById('ui-layer').classList.remove('hidden');
-            document.getElementById('main-menu').classList.add('hidden');
+            galleryData.forEach(item => { grid.innerHTML += `<div class="glass overflow-hidden rounded-[3rem] border-2 border-white/5 group text-center"><img src="${item.u}" class="w-full h-96 object-cover group-hover:scale-110 transition duration-700"><div class="p-12"><h4 class="text-5xl font-black italic uppercase text-balance">${item.t}</h4><p class="text-yellow-500 text-2xl uppercase font-black mt-6 tracking-widest text-center">Missão: ${item.d}</p></div></div>`; });
+            document.getElementById('gallery-overlay').classList.remove('hidden'); document.getElementById('ui-layer').classList.remove('hidden'); document.getElementById('main-menu').classList.add('hidden');
         }
         function closeGallery() { document.getElementById('gallery-overlay').classList.add('hidden'); }
-
-        function openQuiz() {
-            currentQuiz = 0; showQuizQuestion();
-            document.getElementById('quiz-overlay').classList.remove('hidden');
-            document.getElementById('ui-layer').classList.remove('hidden');
-            document.getElementById('main-menu').classList.add('hidden');
-        }
+        function openQuiz() { currentQuiz = 0; showQuizQuestion(); document.getElementById('quiz-overlay').classList.remove('hidden'); document.getElementById('ui-layer').classList.remove('hidden'); document.getElementById('main-menu').classList.add('hidden'); }
         function showQuizQuestion() {
-            const q = quizData[currentQuiz]; 
-            document.getElementById('quiz-result').classList.add('hidden'); 
-            document.getElementById('quiz-container').classList.remove('hidden');
+            const q = quizData[currentQuiz]; document.getElementById('quiz-result').classList.add('hidden'); document.getElementById('quiz-container').classList.remove('hidden');
             document.getElementById('quiz-question').innerText = q.q;
-            const options = document.getElementById('quiz-options'); 
-            options.innerHTML = '';
-            q.a.forEach((opt, idx) => { 
-                options.innerHTML += `<button id="quiz-opt-${idx}" onclick="checkQuiz(${idx})" class="w-full py-4 md:py-5 glass border border-white/10 rounded-2xl hover:bg-white/10 transition-all text-lg md:text-xl font-medium outline-none">${opt}</button>`; 
-            });
+            const options = document.getElementById('quiz-options'); options.innerHTML = '';
+            q.a.forEach((opt, idx) => { options.innerHTML += `<button id="quiz-opt-${idx}" onclick="checkQuiz(${idx})" class="w-full py-10 glass border-4 border-white/10 rounded-[2.5rem] hover:bg-white/10 transition-all text-4xl font-black outline-none uppercase text-balance text-center">${opt}</button>`; });
         }
         function checkQuiz(idx) {
             const q = quizData[currentQuiz];
-            const buttons = document.querySelectorAll('#quiz-options button');
-            buttons.forEach(btn => btn.style.pointerEvents = 'none');
             const selectedBtn = document.getElementById(`quiz-opt-${idx}`);
             const correctBtn = document.getElementById(`quiz-opt-${q.r}`);
+            document.querySelectorAll('#quiz-options button').forEach(b => b.style.pointerEvents = 'none');
             if (idx === q.r) {
                 selectedBtn.classList.add('correct-answer');
-                setTimeout(() => {
-                    currentQuiz++;
-                    if (currentQuiz < quizData.length) { showQuizQuestion(); }
-                    else { document.getElementById('quiz-container').classList.add('hidden'); document.getElementById('quiz-result').classList.remove('hidden'); }
-                }, 1000);
+                setTimeout(() => { currentQuiz++; if (currentQuiz < quizData.length) showQuizQuestion(); else { document.getElementById('quiz-container').classList.add('hidden'); document.getElementById('quiz-result').classList.remove('hidden'); } }, 1200);
             } else {
-                selectedBtn.classList.add('wrong-answer');
-                correctBtn.classList.add('correct-answer');
-                document.body.style.background = "#300"; 
-                setTimeout(() => document.body.style.background = "#010103", 200);
-                setTimeout(() => { showQuizQuestion(); }, 1500);
+                selectedBtn.classList.add('wrong-answer'); correctBtn.classList.add('correct-answer');
+                document.body.style.background = "#500"; setTimeout(() => document.body.style.background = "#010103", 200);
+                setTimeout(() => showQuizQuestion(), 1800);
             }
         }
         function closeQuiz() { document.getElementById('quiz-overlay').classList.add('hidden'); }
-
         window.onload = init;
     </script>
 </body>
